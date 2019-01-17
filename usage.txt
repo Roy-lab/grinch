@@ -1,0 +1,53 @@
+usage: input_file resolution [-o output_prefix] [-b begin_coordinate] [-e end_coordinate] [-k lower_dimension] [-l regularization_strength] [-r neighborhood_radius] [-t sparsity_threshold] [-sfg]
+
+example: ./grinch Gm12878_chr1_25kb.txt 25000 -o Gm12878_chr1 
+
+input_file: 
+	tab-delimited file location and name, each line 
+	contains chromosome and start/end location for 
+	loci 1 and loci 2, followed by interaction count, 
+	e.g.,chr1 0 25000 chr1 25000 50000 8019.7
+resolution: 
+	number of base pairs in a bin, e.g., 25000
+-o output_prefix: 
+	Default is "output". -o Gm12878_chr1 would create 
+	output files prefixed with Gm12878_chr1.
+-b coordinate, -e coordinate: 
+	Default is the smallest bin location and the 
+	largest bin location in input file. If you want to 
+	find TADs in a subregion of the input file, specify 
+	the starting bin location and/or the ending bin 
+	location, e.g., -b 91000000 -e 94000000. Inclusive
+	of ending bin location.
+-k lower_dimension: 
+	Default is the number of rows (or columns since 
+	symmetric) in input matrix / (1000000/resolution). 
+	Specifies the lower dimension of the factors.
+-l regularization_strength: 
+	Default is 1. Higher means the influence of the 
+	graph will be higher when regularizing the factors.
+-r neighborhood_radius: 
+	Default is 4. Number of neighbors on either side 
+	of a given genonic region that will regularize the 
+	region during factorization.
+-t sparsity_threshod: 
+	Default is 50. Minimum number of elements required 
+	in a row/column so that the row/column is included 
+	in the factorization. 0 means no sparse rows/colums
+	are filtered out. 1 means completely empty rows/
+	columns are filtered out. 50 means rows with fewer 
+	than 50 counts will be fitlered out.
+-s: 
+	Print to file the smoothed matrix, in tab-delimited 
+	sparse format (e.g. 25000 50000 500.3). File may be
+	large.
+-f: 
+	Print to file the factor U, after row-normalization. 
+	First column is the genomic region, and the following
+	k columns are the latent feature values from the 
+	factor, e.g., 50000 0.3 0.1 ..., tab-delimited. File
+	may be large, especially for higher-resolution input.
+-g:	Print to file the graph used in regularization. File
+	may be large, since the matrix is written in a dense
+	format.          
+
