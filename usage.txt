@@ -1,53 +1,69 @@
-usage: input_file resolution [-o output_prefix] [-b begin_coordinate] [-e end_coordinate] [-k lower_dimension] [-l regularization_strength] [-r neighborhood_radius] [-t sparsity_threshold] [-sfg]
+Usage: 
+./grinch <sparse matrix file> <region index bed file> <optional arguments>
 
-example: ./grinch Gm12878_chr1_25kb.txt 25000 -o Gm12878_chr1 
+Example: 
+./grinch input/Gm12878_chr1_25kb.txt input/Gm12878_chr1_25kb.bed -o test/Gm12878_chr1
 
-input_file: 
-	tab-delimited file location and name, each line 
-	contains chromosome and start/end location for 
-	loci 1 and loci 2, followed by interaction count, 
-	e.g.,chr1 0 25000 chr1 25000 50000 8019.7
-resolution: 
-	number of base pairs in a bin, e.g., 25000
--o output_prefix: 
-	Default is "output". -o Gm12878_chr1 would create 
-	output files prefixed with Gm12878_chr1.
--b coordinate, -e coordinate: 
-	Default is the smallest bin location and the 
-	largest bin location in input file. If you want to 
-	find TADs in a subregion of the input file, specify 
-	the starting bin location and/or the ending bin 
-	location, e.g., -b 91000000 -e 94000000. Inclusive
-	of ending bin location.
--k lower_dimension: 
-	Default is the number of rows (or columns since 
-	symmetric) in input matrix / (1000000/resolution). 
-	Specifies the lower dimension of the factors.
--l regularization_strength: 
-	Default is 1. Higher means the influence of the 
-	graph will be higher when regularizing the factors.
--r neighborhood_radius: 
-	Default is 4. Number of neighbors on either side 
-	of a given genonic region that will regularize the 
-	region during factorization.
--t sparsity_threshod: 
-	Default is 50. Minimum number of elements required 
-	in a row/column so that the row/column is included 
-	in the factorization. 0 means no sparse rows/colums
-	are filtered out. 1 means completely empty rows/
-	columns are filtered out. 50 means rows with fewer 
-	than 50 counts will be fitlered out.
--s: 
-	Print to file the smoothed matrix, in tab-delimited 
-	sparse format (e.g. 25000 50000 500.3). File may be
-	large.
--f: 
-	Print to file the factor U, after row-normalization. 
-	First column is the genomic region, and the following
-	k columns are the latent feature values from the 
-	factor, e.g., 50000 0.3 0.1 ..., tab-delimited. File
-	may be large, especially for higher-resolution input.
--g:	Print to file the graph used in regularization. File
-	may be large, since the matrix is written in a dense
-	format.          
+Input file format:
+<sparse matrix file>
+0	0	1000.2
+0	1	1201.78
+10	1	200.7
+…
+<region index bed file>
+chr1	50000	75000	0
+chr1	75000	100000	1
+chr1	100000	125000	2
+…
+*Note: bin size/resolution is assumed to be the same across all bins and
+is automatically detected from the bed file.
 
+Output files:
+<output>.tads 
+start	end
+50000	1175000
+1200000	1275000
+…
+<output>.log
+Includes information about parameters used, and time/memory consumption
+*Note: TAD boundaries are inclusive, i.e., [start, end].
+
+Optional arguments:
+-o <output file prefix> 
+	changes output file name to <output file prefix>.*, e.g. test/Nhek_chr1
+	Note: will NOT create a directory if the specified directory does not
+	exist.
+	[default] ‘output’
+-k <number of clusters>
+	number of clusters
+	[default] n/(1MB/bin size), where n is the number of bins in 
+	the input matrix, i.e., expected size of cluster is 1MB
+-e <expected size of cluster>
+	a different way to specify the number of clusters by the expected size 
+	of a cluster, i.e. if 500000, k = n/(500KB/bin size), where n is the 
+	number of bins in the input matrix
+	[default] 1000000, i.e., k = n/(1MB/bin size)
+-r <radius of neighborhood used in regularization, in number of bins>
+	radius of the neighborhood used in regularization graph, 
+	in number of bins.
+	[default] 4
+-n <neighborhood radius size in basepairs, in multiples of resolution in bed file>
+	neighborhood radius used in regularization graph, in base pairs rather 
+	than number of bins. 
+	e.g. -n 100000 would make neighborhood radius of 4 bins in 25kb resolution 
+	[default] 100000
+-l <lambda>
+	strength of regularization
+	[default] 1
+-f
+	output factor matrix files, <output>.U and <output>.V, in DENSE format,
+	with n lines and k columns in each line, where n is the number of bins
+	in the input matrix and k is the number of clusters from -k or
+	calculated from -a
+-s 
+	output smoothed matrix file, <output>.smoothed, in a sparse format 
+	(same format as the input sparse matrix file)
+-g
+	output graph used for regularization, <output>.graph, in DENSE format,
+	with n lines and n columns, where n is the number of bins in the input
+	matrix 

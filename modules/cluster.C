@@ -14,9 +14,8 @@
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/resource.h>
-#include <sys/time.h>
 #include "cluster.H"
+#include "kmedoids.H"
 
 int cluster::assignMaxArgIndex(gsl_matrix* U, vector<int>* clusterAssignment) {
 	int n = U->size1;
@@ -34,6 +33,17 @@ int cluster::assignMaxArgIndex(gsl_matrix* U, vector<int>* clusterAssignment) {
 	return numAmbiguousAssignments;
 }
 
+int cluster::assignClusterConstrainedKMedoids(gsl_matrix* U, vector<int>* clusterAssignment){
+        int n = U->size1;
+        int k = U->size2;
+        Kmedoids clustering = Kmedoids(k, U, 0);
+        clustering.cluster();
+        gsl_vector* clusters = clustering.getClusters();
+	for (int i = 0; i <n; i++) {
+		clusterAssignment->push_back((int)gsl_vector_get(clusters,i));
+	}
+	return 0;
+}
 int cluster::findTads(vector<int>* clusters, list<Tad>* tl) {
 
 	int n = clusters->size();
@@ -45,10 +55,8 @@ int cluster::findTads(vector<int>* clusters, list<Tad>* tl) {
 		int c = *itr;
 		if (c != currCluster) {
 			Tad t;
-			t.offset = currOffset;
-			t.len = i - currOffset;
-			t.depth = 0;
-			t.cluster = currCluster;
+			t.start = currOffset;
+			t.end = i-1;
 			tl->push_back(t);
 			currCluster = c;
 			currOffset = i;
@@ -57,10 +65,8 @@ int cluster::findTads(vector<int>* clusters, list<Tad>* tl) {
 	}
 	
 	Tad t;
-	t.offset = currOffset;
-	t.len = n - currOffset;
-	t.depth = 0;
-	t.cluster = currCluster;
+	t.start= currOffset;
+	t.end = n-1;
 	tl->push_back(t);
 	return 0;
 }

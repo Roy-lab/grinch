@@ -13,12 +13,12 @@
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include "modules/io.H"
 #include "modules/initialization.H"
 #include "modules/regularization.H"
 #include "modules/cluster.H"
 #include "modules/factorization.H"
-#include "modules/preprocessing.H"
 #include <sys/time.h>
 #include <sys/resource.h>
 
@@ -30,48 +30,47 @@ int main(int argc, char **argv)
 	struct rusage bUsage;
 	getrusage(RUSAGE_SELF,&bUsage);
 
-	const char* inputFile;
+	const char* matFile;
+	const char* bedFile;
 	int binSize;
 	
 	int start = -1;
 	int end = -1;
 	
 	int k = -1;
-	int radius = 4;
+	int expectedClusterSize = 1000000;
+	int radiusBinNum = 4;
+	int neighborhoodSize = 100000;
 	double lambda = 1;
-	int threshold = 50;
 	
 	string outputPrefix = string("output");
 	bool outputXSmoothed = false;
 	bool outputFactors = false;
 	bool outputGraph = false;
-		
+	
 	int seed = 0; 
 	string usage = string("usage.txt");
 
 	int c;
-	while((c = getopt(argc, argv, "o:b:e:k:r:l:t:mfsgh")) != -1)
+	while((c = getopt(argc, argv, "o:e:k:n:r:l:d:fsgh")) != -1)
 		switch (c) {
 			case 'o':
 				outputPrefix = string(optarg);
 				break;
-			case 'b':
-				start = atoi(optarg);
-				break;
 			case 'e':
-				end = atoi(optarg);
+				expectedClusterSize = atoi(optarg);
 				break;
 			case 'k':
 				k = atoi(optarg);
 				break;
+			case 'n':
+				neighborhoodSize = atoi(optarg);
+				break;
 			case 'r':
-				radius = atoi(optarg);
+				radiusBinNum = atoi(optarg);
 				break;
 			case 'l':
 				lambda = atof(optarg);
-				break;
-			case 't':
-				threshold = atoi(optarg);
 				break;
 			case 's':
 				outputXSmoothed = true;
@@ -80,14 +79,17 @@ int main(int argc, char **argv)
 				outputFactors = true;
 				break;
 			case 'g':
-				outputGraph =true;
+				outputGraph = true;
+				break;
+			case 'd':
+				seed = atoi(optarg);
 				break;
 			case 'h':
 				io::printUsageToStdOut(usage);
 				return 0;
 			case '?':
 				io::printUsageToStdOut(usage);
-				return 1;
+				return 0;
 			default:
 				io::printUsageToStdOut(usage);
 				return 1;
@@ -97,113 +99,86 @@ int main(int argc, char **argv)
 		io::printUsageToStdOut(usage);
 		return 1;
 	} else {
-		inputFile = argv[optind];
-		binSize = atoi(argv[optind+1]);
+		matFile = argv[optind];
+		bedFile = argv[optind+1];
 	}
 
 	ofstream logFile;
         logFile.open((outputPrefix+".log").c_str());
-	logFile << "Hi-C resolution = " << binSize << " (basepairs per bin)" << endl;
 
-	// Read input file		
-	string inputFileName(inputFile);
-	cout << "Reading interaction-counts file: " << inputFileName << endl;
-	logFile << "Input file = " << inputFileName << endl;
-	if (start < 0 || end < 0) {
-		int b = -1;
-		int e = -1;
-		io::getMinAndMaxCoord(inputFileName, b, e);
-		if (start < 0) {
-			start = b;
-		}
-		if (end < 0) {
-			end = e;
-		}
-	}
+	// Read input files		
+	cout << "Reading input files..." << endl;
+	string bedFileName(bedFile);
+	string matFileName(matFile);
+	logFile << "HiC file = " << matFileName << endl;
+	logFile << "Bed file = " << bedFileName << endl;
+	string chro;
+	int n;
+	io::readMetaData(bedFileName, chro, binSize, n, start, end); 
+	logFile << "Chromosome = " << chro << endl;
+	logFile << "HiC resolution = " << binSize << " (basepairs per bin)" << endl;
 	logFile << "Starting coordinate = " << start << endl;
 	logFile << "Ending coordinate = " << end << endl;
 
-	int length = (end - start)/binSize + 1;
-	if (k < 0) {
-		k = length / (1000000/binSize);
-	}
+	gsl_matrix* X = gsl_matrix_calloc(n, n);
+	double avg, nonZeroCnt;
+	io::readHiCFile(matFileName, X, avg, nonZeroCnt);
+	
+	// Set k
+	k = n / (expectedClusterSize/binSize);
 	logFile << "Lower dimension k = " << k << endl;
-	gsl_matrix* X = gsl_matrix_calloc(length, length);
-	double avg = 0.0;
-	io::readHiCFile(inputFileName, X, start, binSize, avg);
-
-	// remove sparse rows/columns
-	vector<int> shifted = prep::removeEmptyRows(X, threshold);
-	int n = shifted.size();
-	logFile << "Sparsity threshold t = " << threshold << " (dropped " << length - n << " rows/columns with less than than " << threshold << " counts)" << endl;
-	gsl_matrix_view hic = gsl_matrix_submatrix(X, 0, 0, n, n);
-
+	
 	// Initialize U & V
 	cout << "Initializing factor matrices with NNDSVDa..." << endl;
-	gsl_matrix* U = gsl_matrix_alloc(n, k);
-	gsl_matrix* V = gsl_matrix_alloc(n, k);
-	init::nndsvd(&hic.matrix, U, V, seed, avg);
+	gsl_matrix* U = gsl_matrix_calloc(n, k);
+	gsl_matrix* V = gsl_matrix_calloc(n, k);
+	init::nndsvd(X, U, V, seed, avg);
+	//init::random(U, V, seed);
 
 	// Create weight matrix
 	cout << "Creating neighborhood adjacency matrix for graph regularization..." << endl;
-	gsl_matrix* W = gsl_matrix_alloc(n, n);
-	gr::getWeightMatrixBinaryNeighbors(W, radius, shifted);
+	gsl_matrix* W = gsl_matrix_calloc(n, n);
+	radiusBinNum = neighborhoodSize / binSize;
+	logFile << "Neighborhood radius = " << radiusBinNum << endl;
 	logFile << "Strength of regularization lambda = " << lambda << endl;
-	logFile << "Neighborhood radius r = " << radius << endl;
-
+	gr::getWeightMatrixBinaryNeighbors(W, radiusBinNum); 
+	
 	// Graph-regularized NMF
 	cout << "Factorizing input Hi-C matrix..." << endl;
-	gr::nmf(&hic.matrix, U, V, W, lambda);
+	gr::nmf(X, U, V, W, lambda);
 	gsl_matrix_free(X);
 
-	// Optional output: smoothed count matrix before row-normalizing U
+	if(outputGraph) {
+		io::writeMatrixDenseFormat(outputPrefix + ".graph", W);
+	}
+	gsl_matrix_free(W);
+	
+	cout << "Clustering..." << endl;	
+	vector<int> clusters;
+	cluster::assignClusterConstrainedKMedoids(U,&clusters);
+	//io::writeClusters(outputPrefix + ".cluster", clusters, start, binSize);
+
+	list<Tad> tads;
+	cluster::findTads(&clusters, &tads);
+	io::writeTads(outputPrefix + ".tads", &tads, start, binSize);
+ 
+	// Optional output: smoothed count matrix
 	if(outputXSmoothed) {
 		gsl_matrix* X_smoothed = gsl_matrix_alloc(n,n);
 		nmf::matrixCompletion(X_smoothed, U, V);	
-		string xOutputFile = outputPrefix + ".smooth";
-		cout << "Output smoothed matrix to file:\n\t " << xOutputFile << endl;
-		io::outputMatrixSparseFormat(xOutputFile, X_smoothed, start, binSize, n, shifted); 
+		cout << "Output smoothed matrix to file:\n\t " << outputPrefix << ".smoothed" << endl;
+		io::writeMatrixSparseFormat(outputPrefix + ".smoothed", X_smoothed); 
 		gsl_matrix_free(X_smoothed);
 	}
-
-	// Clustering factors
-	cout << "Clustering factor rows..." << endl;
-	vector<int> clusters;
-	cluster::assignMaxArgIndex(U, &clusters);
-
-	// Shifting cluster assignments to account for filtered rows
-	vector<int> l(length, -20);
-	for (int i =0; i <n; i++) {
-		int shift = shifted[i];
-		l[i+shift] = clusters[i]; 
-	}	
-
-	// Find contiguous chunks of clusters (TADs)
-	list<Tad> tl;
-	cluster::findTads(&l, &tl);
 	
-	// Output contiguous chunks of clusters (TADs)
-	string tadOutputFile = outputPrefix + ".tad";
-	cout << "Output contingous cluster (putative TAD) coordinates file:\n\t" << tadOutputFile << endl;
-	io::outputTads(tadOutputFile, &tl, start, binSize);
-
-	// Optional output: weight matrix
-	if (outputGraph) {
-		string wOutputFile = outputPrefix + ".graph";
-		cout << "Output weight matrix used in graph regularization to file:\n\t" << wOutputFile << endl;
-		io::outputMatrixDenseFormat(wOutputFile, W); 
-	}
-	gsl_matrix_free(W);
-
 	// Optional output: factor matrices
 	if (outputFactors) {
-		cout << "Output factors to file:\n\t" << outputPrefix << ".factor" << endl;	
-		io::outputFactorSparseFormat(outputPrefix + ".factor", U, start, binSize, shifted);
+		cout << "Writing factors to file:\n\t" << outputPrefix << ".U/V" << endl;	
+		io::writeMatrixDenseFormat(outputPrefix + ".U", U);
+		io::writeMatrixDenseFormat(outputPrefix + ".V", V);
 	}
-
 	gsl_matrix_free(U);
 	gsl_matrix_free(V);
-
 	struct timeval endTime;
 	gettimeofday(&endTime,NULL);
 

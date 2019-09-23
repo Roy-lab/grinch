@@ -8,11 +8,11 @@ using namespace std;
 namespace io
 {
 	int printUsageToStdOut(string);
-	int getMinAndMaxCoord(string, int &, int &);
-	int readHiCFile(string, gsl_matrix*, int, int, double &);
-	int outputTads(string, list<Tad>*, int, int); 
-	int outputFactorSparseFormat(string, gsl_matrix*, int, int, vector<int>);
-	int outputMatrixSparseFormat(string, gsl_matrix*, int, int, int, vector<int>);
-	int outputMatrixDenseFormat(string, gsl_matrix*);
+	int readMetaData(string, string &, int &, int &, int &, int &);
+	int readHiCFile(string, gsl_matrix*, double &, double &);
+	int writeTads(string, list<Tad>*, int, int); 
+	int writeClusters(string, vector<int>, int, int); 
+	int writeMatrixSparseFormat(string, gsl_matrix*);
+	int writeMatrixDenseFormat(string, gsl_matrix*);
 };
 #endif

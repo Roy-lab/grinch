@@ -27,113 +27,100 @@ int io::printUsageToStdOut(string inputFile) {
 	return 0;
 }
 
-int io::getMinAndMaxCoord(string inputFile, int &start, int &end) {
+int io::readMetaData(string inputFile, string &chro,int &binsize, int &n, int &start, int &end) {
 	ifstream f(inputFile.c_str());
-	int min = INT_MAX;
-	int max = 0;
-	while(f.good()) {
-		int x,y;
-		string _;
-		f >> _ >> x >> _ >> _ >> y >> _ >> _;
-		if (x < min) {
-			min = x;
+	int x,y,idx;
+	string s;
+	while(f >> s >> x >> y >> idx) {
+		if (idx == 0) {
+			chro = s;
+			binsize = y - x;
+			start = x;
 		}
-		if (x > max) {
-			max = x;
-		}
-		if (y < min) {
-			min = y;
-		}
-		if (y > max) {
-			max = y;
-		}
+		n = idx;
+		end = x;		
 	}
+	n = n + 1; // zero-indexed
 	f.close();
-	start = min;
-	end = max;
 	return 0;
 }
 
-int io::readHiCFile(string inputFile, gsl_matrix* X, int start, int binSize, double &avg) {
-	int dim = X->size1; // assuming symmetric matrix
+int io::readHiCFile(string inputFile, gsl_matrix* X, double &avg, double &nonZeroCnt) { //, vector<int> &tally) {
+	int n = X->size1; // assuming symmetric matrix
+	int m = X->size2;
 	ifstream inFile(inputFile.c_str());
 	avg = 0.0;
-	while(inFile.good()) {
-		int x, y;
-		double cnt;
-		string _;
-		inFile >> _ >> x >> _ >> _ >> y >> _ >> cnt;
-		x = (x-start)/binSize;
-		y = (y-start)/binSize;
-		if (x >= 0 && x < dim && y >= 0 && y < dim) {
-			if (cnt < 0) {
-				cnt = 0;
+	double diagonalCnt = 0;
+	double offDiagonalCnt = 0;
+	int x, y;
+	double cnt;
+	while(inFile >> x >> y >> cnt) {
+		gsl_matrix_set(X, x, y, cnt);
+		gsl_matrix_set(X, y, x, cnt);
+		avg = avg + cnt;
+		if (cnt > 0) {
+			if (x == y) {
+				diagonalCnt += 1;
+			} else {
+				offDiagonalCnt += 1;
 			}
-			gsl_matrix_set(X, x, y, cnt);
-			gsl_matrix_set(X, y, x, cnt);
-			avg = avg + cnt;
 		}
 	}
 	inFile.close();
-	avg = avg/(dim * dim * 1.0);
+	avg = avg/(n * m * 1.0);
+	nonZeroCnt = diagonalCnt + 2*offDiagonalCnt;
 	return 0;
 }
 
-int io::outputTads(string outputFile, list<Tad>* tl, int start, int binSize) {
+int io::writeTads(string outputFile, list<Tad>* tl, int start, int binSize) {
 
 	ofstream ot;
 	ot.open(outputFile.c_str());
-	ot << "First_Bin\tLast_Bin" << endl;
 
 	list<Tad>::iterator itr;
 	for (itr = tl->begin(); itr != tl->end(); ++itr) {
-		int c = itr->cluster;
-		if (c >= 0) {
-			int b = itr->offset;
-			int e = b + (itr->len) - 1;
-			ot << b * binSize + start << "\t" << e * binSize + start  << endl;
-		}
+		int b = itr->start;
+		int e = itr->end;
+		ot << b * binSize + start << "\t" << e * binSize + start  << endl;
 	}
 
 	ot.close();
 	return 0;
 }
 
-int io::outputFactorSparseFormat(string outputFile, gsl_matrix* F, int start, int binSize, vector<int> shifted) {
+int io::writeClusters(string outputFile, vector<int> clusters, int start, int binSize) {
+
 	ofstream ot;
 	ot.open(outputFile.c_str());
-	int rowNum = F->size1;
-	int colNum = F->size2;
-	for (int i = 0; i <rowNum; i++) {	
-		int loc = i + shifted[i];
-		ot << start + loc*binSize;
-		for (int j = 0; j < colNum; j++) {
-			ot << "\t" << gsl_matrix_get(F, i, j);		
-		}
-		ot << endl;
+
+	int n = clusters.size();
+	for (int i = 0; i < n; i++) {
+		ot << i * binSize + start << "\t" << clusters[i]  << endl;
 	}
+
 	ot.close();
 	return 0;
 }
 
-int io::outputMatrixSparseFormat(string outputFile, gsl_matrix* X, int start, int binSize, int maxDistance, vector<int> shifted) {
+int io::writeMatrixSparseFormat(string outputFile, gsl_matrix* X) {
 	ofstream ot;
 	ot.open(outputFile.c_str());
-	ot << "Bin1_Location\tBin2_Location\tInteraction_Count" << endl;
 	
 	int rowNum = X->size1;
+	int colNum = X->size2;
 	for (int i = 0; i < rowNum; i++) {
-		for (int j = i; j < maxDistance; j++) {
-			int b = i + shifted[i];
-			int e = j + shifted[j];
-			ot << start + b*binSize << "\t" << start + e*binSize << "\t" << gsl_matrix_get(X, i, j) << endl;
+		for (int j = 0; j < colNum; j++) {
+			double val = gsl_matrix_get(X, i, j);
+			if (val > 0) {
+				ot << i << "\t" << j << "\t" << val << endl;
+			}
 		}
 	}
 	ot.close();
 	return 0;
 }
 
-int io::outputMatrixDenseFormat(string outputFile, gsl_matrix* X) {
+int io::writeMatrixDenseFormat(string outputFile, gsl_matrix* X) {
 	ofstream ot;
 	ot.open(outputFile.c_str());
 	int rowNum = X-> size1;

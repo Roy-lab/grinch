@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_matrix.h>
@@ -14,8 +15,6 @@
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/resource.h>
-#include <sys/time.h>
 #include "regularization.H"
 
 int gr::getColumnSumDiagonalMatrix(gsl_matrix* W, gsl_matrix* D) {
@@ -28,18 +27,15 @@ int gr::getColumnSumDiagonalMatrix(gsl_matrix* W, gsl_matrix* D) {
 	return 0;
 }
 
-int gr::getWeightMatrixBinaryNeighbors(gsl_matrix* W, int neighborhoodRadius, vector<int> shifted) {
+int gr::getWeightMatrixBinaryNeighbors(gsl_matrix* W, int neighborhoodRadius) {
 	int larger_dim = W->size1;
 	int colCnt = W->size2;
 	// weight matrix
 	for (int i = 0; i < larger_dim; i++) {
 		int min = i - neighborhoodRadius < 0 ? 0 : i - neighborhoodRadius;
 		int max = i + neighborhoodRadius >= colCnt ? colCnt - 1 : i + neighborhoodRadius;
-		int shiftedBy = shifted[i];
 		for (int j = min; j <= max; j++) {
-			if (shifted[j] == shiftedBy) {
-				gsl_matrix_set(W, i, j, 1.0);
-			}
+			gsl_matrix_set(W, i, j, 1);
 		}
 	}
 	return 0;
@@ -104,16 +100,14 @@ int gr::nmf(gsl_matrix* X, gsl_matrix* U, gsl_matrix* V, gsl_matrix* W, double l
 		//U_new = U(XV + lambda*WU)(UV'V + lambda*DU)^(-1)
 		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, X, V, 0.0, denom); // XV
 				
-		gsl_matrix_view W_view_ = gsl_matrix_submatrix(W, 0, 0, rowCnt, rowCnt);
-		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, &W_view_.matrix, U, 0.0, weight); //WU
+		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, W, U, 0.0, weight); //WU
 		gsl_matrix_scale(weight, lambda); //lambda * WU
 		gsl_matrix_add(denom, weight); //XV + lambda * WU
 		
 		gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, U, V, 0.0, numer_); // UV'
 		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, numer_, V, 0.0, numer); // UV'V
 	
-		gsl_matrix_view D_view_ = gsl_matrix_submatrix(D, 0, 0, rowCnt, rowCnt);
-		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, &D_view_.matrix, U, 0.0, diag); // DU
+		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, D, U, 0.0, diag); // DU
 		gsl_matrix_scale(diag, lambda); // lambda * DU
 		gsl_matrix_add(numer, diag); // UV'V + lambda * DU
 
@@ -123,16 +117,14 @@ int gr::nmf(gsl_matrix* X, gsl_matrix* U, gsl_matrix* V, gsl_matrix* W, double l
 		// V_new = V(X'U + lambda*WV)(VU_new'U_new + lambda*DV)^(-1)
 		gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, X, U, 0.0, denom2);// X'U
 
-		gsl_matrix_view W_view = gsl_matrix_submatrix(W, 0, 0, colCnt, colCnt);
-		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, &W_view.matrix, V, 0.0, weight2); // WV
+		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, W, V, 0.0, weight2); // WV
 		gsl_matrix_scale(weight2, lambda); //lambda * WV
 		gsl_matrix_add(denom2, weight2); // X'U + lambda * WV
 
 		gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, V, U, 0.0, numer_2); // VU'
 		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, numer_2, U, 0.0, numer2); // VU'U
 
-		gsl_matrix_view D_view = gsl_matrix_submatrix(D, 0, 0, colCnt, colCnt);
-		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, &D_view.matrix, V, 0.0, diag2); // DV
+		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, D, V, 0.0, diag2); // DV
 		gsl_matrix_scale(diag2, lambda); // lambda * DV
 		gsl_matrix_add(numer2, diag2); // VU'U + lambda * DV
 

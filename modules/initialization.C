@@ -90,7 +90,7 @@ int init::nndsvd(gsl_matrix* A, gsl_matrix* W, gsl_matrix* H, int seed, double a
 	gsl_matrix_free(U);
 	gsl_matrix_free(V);
 	gsl_matrix_free(S);	
-
+	
 	for (int i=0; i < m; i++) {
 		for (int j=0; j < k; j++) {
 			double val = gsl_matrix_get(W, i, j);
