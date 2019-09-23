@@ -41,12 +41,8 @@ Optional arguments:
 -e <expected size of cluster>
 	a different way to specify the number of clusters by the expected size 
 	of a cluster, i.e. if 500000, k = n/(500KB/bin size), where n is the 
-	number of bins in the input matrix
+	number of bins in the input matrix. Note: -k overrides -e.
 	[default] 1000000, i.e., k = n/(1MB/bin size)
--r <radius of neighborhood used in regularization, in number of bins>
-	radius of the neighborhood used in regularization graph, 
-	in number of bins.
-	[default] 4
 -n <neighborhood radius size in basepairs, in multiples of resolution in bed file>
 	neighborhood radius used in regularization graph, in base pairs rather 
 	than number of bins. 

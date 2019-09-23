@@ -125,7 +125,9 @@ int main(int argc, char **argv)
 	io::readHiCFile(matFileName, X, avg, nonZeroCnt);
 	
 	// Set k
-	k = n / (expectedClusterSize/binSize);
+	if (k < 0) {
+		k = n / (expectedClusterSize/binSize);
+	}
 	logFile << "Lower dimension k = " << k << endl;
 	
 	// Initialize U & V
