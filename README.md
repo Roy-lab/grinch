@@ -4,7 +4,7 @@ GRiNCH applies non-negative matrix factorization (NMF) with graph regularization
 ![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/K562_chr12_5kb.png "GRINCH clusters discovered from Hi-C data, with CTCF binding enriched in cluster boundaries")
 
 #### Usage
-./grinch input.txt input.bed \[-o output_prefix\] 
+./grinch input.txt input.bed \[-o output_prefix\] \[-k number_of_clusters\] \[-e expected_size_of_cluster\] \[n neighborhood_radius\] \[-l regularization_strength\] \[-fgs\]
 ```
 >> ./grinch -h
 >> ./grinch Huvec_chr12_25kb.txt Huvec_chr12_25kb.bed -o output/Huvec_chr12_25kb
@@ -18,7 +18,7 @@ GRiNCH applies non-negative matrix factorization (NMF) with graph regularization
 | optional | -o <output_file_prefix>    | Ouput file path and prefix. Note: will NOT create a directory if the specified directory does not exist. | 'output' | 
 | optional | -k <number_of_clusters>  | Number of clusters, an integer value. |  n/(1000000/bin size) where n is the dimension of the symmetric input Hi-C matrix and bin size is the resolution in basepairs, i.e. k is set such hat the expected size of a cluster is 1Mb. | 
 | optional | -e <expected_size_of_cluster>  | A different way to specify the number of clusters by the expected size of a cluster, i.e. if -e 500000, k = n/(500KB/bin size), where n is the number of bins in the input matrix. Note: -k will override -e. | 1000000, i.e. k = n / (1Mb/bin size) |  
-| optional | -n <neighborhood_radius_size>  | Neighborhood radius used in regularization graph, in base pairs, and in multiples of resolution. -n 100000 would make neighborhood radius of 4 bins in 25kb resolution, and 4 adjacent regions on either side of a given regions will be used to regularize or 'smooth' the matrix factors. Increase for lower-depth or sparser data, to use more neighbors for smoothing. | 100000 | 
+| optional | -n <neighborhood_radius>  | Neighborhood radius used in regularization graph, in base pairs, and in multiples of resolution. -n 100000 would make neighborhood radius of 4 bins in 25kb resolution, and 4 adjacent regions on either side of a given regions will be used to regularize or 'smooth' the matrix factors. Increase for lower-depth or sparser data, to use more neighbors for smoothing. | 100000 | 
 | optional | -l <lambda>  | Strength of regularization. | 1 | 
 | optional | -s | Print the smoothed matrix to file,  in tab-delimited sparse matrix format (e.g. 25000 50000 500.3). This file can be large. | Do NOT output smoothed matrix. |
 | optional | -f | Print to file the factor U and V. File may be large, since the matrix is written in a dense format, especially for higher-resolution input. | Do NOT output factor matrix. |
