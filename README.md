@@ -4,15 +4,16 @@ GRiNCH applies non-negative matrix factorization (NMF) with graph regularization
 ![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/K562_chr12_5kb.png "GRINCH clusters discovered from Hi-C data, with CTCF binding enriched in cluster boundaries")
 
 #### Usage
-./grinch input.txt input.bed \[-o output_prefix\] \[-k number_of_clusters\] \[-e expected_size_of_cluster\] \[n neighborhood_radius\] \[-l regularization_strength\] \[-fgs\]
+./grinch input.txt input.bed \[-o output_prefix\] \[-k number_of_clusters\] \[-e expected_size_of_cluster\] \[-n neighborhood_radius\] \[-l regularization_strength\] \[-fgs\]
 ```
 >> ./grinch -h
 >> ./grinch Huvec_chr12_25kb.txt Huvec_chr12_25kb.bed -o output/Huvec_chr12_25kb
 ```
 
 #### Parameters
-| Position | Parameter           | Description | Default Value/Behavior | 
-| -     | -------------          | ----------------- | ---- |
+
+| Position | Parameter | Description | Default Value/Behavior | 
+| :---    | :---        | :--- | :--- |
 | 1     | input matrix file      | Input matrix file path and name. Tab-delimited, in sparse matrix format, no header, e.g. 0 10 1201.78 | N/A | 
 | 2     | input bed file         | Input bed file mapping each index in the input matrix file to a chromosomal coordinate. Tab-delimited, no header, e.g. chr1 50000  75000 0. Note: Bin size/resolution of the Hi-C data is assumed to be the same across all bins. Also, only cis-interactions are handled, i.e. the chromosome for all bins are assumed to be the same. | N/A | 
 | optional | -o <output_file_prefix>    | Ouput file path and prefix. Note: will NOT create a directory if the specified directory does not exist. | 'output' | 
