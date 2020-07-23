@@ -1,17 +1,16 @@
-## GRiNCH: Graph-Regularized NMF and Clustering for Hi-C Data
+### GRiNCH: Graph-Regularized NMF and Clustering for Hi-C Data
 GRiNCH applies non-negative matrix factorization (NMF) with graph regularization to discover clusters of highly interacting genomic regions from high-throughput chromosome conformation capture (Hi-C) data.
 
 ![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/K562_chr12_5kb.png "GRINCH clusters discovered from Hi-C data, with CTCF binding enriched in cluster boundaries")
 
-### Usage
+#### Usage
 ./grinch input.txt input.bed \[-o output_prefix\] \[-k number_of_clusters\] \[-e expected_size_of_cluster\] \[-n neighborhood_radius\] \[-l regularization_strength\] \[-fgs\]
 ```
 >> ./grinch -h
 >> ./grinch Huvec_chr12_25kb.txt Huvec_chr12_25kb.bed -o output/Huvec_chr12_25kb
 ```
 
-### Parameters
-
+#### Parameters
 | Position | Parameter | Description | Default Value/Behavior | 
 | :---    | :---        | :--- | :--- |
 | 1     | input matrix file      | Input matrix file path and name. Tab-delimited, in sparse matrix format, no header, e.g. 0 10 1201.78 | N/A | 
@@ -25,7 +24,7 @@ GRiNCH applies non-negative matrix factorization (NMF) with graph regularization
 | optional | -f | Print to file the factor U and V. File may be large, since the matrix is written in a dense format, especially for higher-resolution input. | Do NOT output factor matrix. |
 | optional | -g | Print to file the graph used in regularization. File may be large, since the matrix is written in a dense format.| Do NOT output graph. |
 
-### Input file format
+#### Input file format
 * Matrix file, tab-delimited, sparse-matrix format, no header 
 ```
 0	0	1000.2
@@ -40,7 +39,8 @@ chr1	75000	100000	1
 chr1	100000	125000	2
 ...
 ```
-### Output files
+
+#### Output files
 * File suffixed `.tads` returns a list of putative TADs, each line with the first and last bin of each TAD (inclusive of last bin).
 * File suffixed `.log` returns a plain-text file with list of parameter values used and time/memory consumption.
 * Optional output file suffixed `.smoothed` returns the smoothed matrix in a tab-delimited sparse matrix format. This file may be large.
@@ -48,15 +48,11 @@ chr1	100000	125000	2
 * Optional output file suffixed `.graph` returns the graph used in regularization. File may be large, since the matrix is written in a dense format.
 
 ### Visualize
-
 Refer to our [handy dandy visualization scripts](https://github.com/Roy-lab/grinch/blob/master/visualization/) to generate images of Hi-C heatmaps, GRiNCH clusters, and other 1D epigenetic signals like the one below:
-
 ![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/zfp608.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells, neural precursor cells, and cortical neurons, along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals.")
 
-### Installation & Dependencies
-
+#### Installation & Dependencies
 Installation instructions below were tested in Linux Centos 7 distribution. [GSL (GNU Scientific Library)](https://www.gnu.org/software/gsl/doc/html/index.html) is used to handle matrix- and vector-related operations. 
-
 1. __If you already have GSL installed__, edit the first few lines of the Makefile to point to the correct include and shared library directory, then jump to step 3.
 ```
 #CHANGE PATHS AS NEEDED:
@@ -79,5 +75,4 @@ make
 ```
 ./grinch -h
 ```
-
 Note: in order to implement NNDSVD initialization of factors, a fast randomized SVD algorithm from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes) was used. A minor modification to allow random seed specification was made to the original code from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes/tree/master/single_core_gsl_code). This updated code is included under modules/random_svd directory. Compilation of this code is part of the included Makefile; no additional step is necessary for installation.
