@@ -47,16 +47,27 @@ chr1	100000	125000	2
 * Optional output file suffixed '.U' and '.V' returns the factors U and V respectively, in dense matrix format. File may be large, especially for higher-resolution input. Note that since the input cis-interaction Hi-C matrix is symmetric, U and V are equivalent up to some scaling factor and numerical error.
 * Optional output file suffixed '.graph' returns the graph used in regularization. File may be large, since the matrix is written in a dense format.
 
-#### Dependencies
-[GSL (GNU Scientific Library)](https://www.gnu.org/software/gsl/doc/html/index.html) is used to handle matrix- and vector-related operations. The exact version used to compile the binary file (grinch) is included in this repo as a tarball (gsl.tgz). If the binary file fails to execute due to library dependency issues, try:
-1. Download gsl.tgz from this repo and untar it (`tar -xzf gsl.tgz`).
-2. Add the location of the untarred library to LD_LIBRARY_PATH. Assuming the library is in your current directory:
-```
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:./gsl-sparse/lib/
-```
-3. Try executing the binary file again.
+#### Installation & Dependencies
+Installation instructions below were tested in Linux Centos 7 distribution. 
 
-In order to implement NNDSVD initialization of factors, a fast randomized SVD algorithm from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes) was used. A minor modification to allow random seed specification was made to the original code from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes/tree/master/single_core_gsl_code). The code was compiled and included in this repo under modules/random_svd directory. For this dependency, no additional installation is required.
+[GSL (GNU Scientific Library)](https://www.gnu.org/software/gsl/doc/html/index.html) is used to handle matrix- and vector-related operations. 
+1. __If you already have GSL installed__, edit the first two lines of the Makefile to point to the correct include and shared library directory, then jump to step 3.
+```
+#CHANGE PATHS AS NEEDED:
+INCLUDE_PATH = ${CONDA_PREFIX}/include
+LIBRARY_PATH = ${CONDA_PREFIX}/lib
+```
+2. __If you do not have GSL installed, or you are not sure__, the easiest way to get it installed is to use [conda](https://anaconda.org/conda-forge/gsl/):
+```
+conda install -c conda-forge gsl
+```
+3. Make sure to add the location of the installed shared library to where the compiler/linker will be looking. If you used conda to install GSL to the default location in step 2, run the following command (or add the appropriate path if you already have GSL installed):
+```
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib
+```
+4. And let's install!
+```
+make
+```
 
-#### Installation
-A make file is provided if you should want/need to recomplie the binary file grinch: `make grinch`. Compilers gcc and g++ are required.
+Note: in order to implement NNDSVD initialization of factors, a fast randomized SVD algorithm from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes) was used. A minor modification to allow random seed specification was made to the original code from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes/tree/master/single_core_gsl_code). This updated code is included under modules/random_svd directory. Compilation of this code is part of the included Makefile; no additional step is necessary for installation.
