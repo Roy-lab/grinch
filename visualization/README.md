@@ -9,9 +9,9 @@ The scripts were tested in Python 3.7 Anaconda environment. Here are the depende
 * pandas
 
 #### Data
-* The tarball of the data used to generate the figures below (also part of the repository as *.png files) can be downloaded from: <http://pages.discovery.wisc.edu/~elee1/grinch_git/data.tgz>. 
+* The tarball of the data used to generate the figures below (also part of the repository as `*.png` files) can be downloaded from: <http://pages.discovery.wisc.edu/~elee1/grinch_git/data.tgz>. 
 * Once untarred, if you place the data/ directory at the same level as the rest of the scripts, you can simply run the scripts with the commands noted below. 
-* See the specific configuration files (`pyramid.ini`,`diamond.ini`) used below to see which of the input files are used, and the required format for each.
+* See the configuration files (`pyramid.ini`,`diamond.ini`) to find which input files are used to generate each figure.
 * The directory also includes a README with data sources.
 
 #### HiC heatmaps + GRiNCH clusters + genes + epigenetic signal tracks
@@ -23,7 +23,7 @@ To generate this image:
 ```
 >> python pyramid.py pyramid.ini
 ```
-and see the output file, zfp608.png. See pyramid.ini for list of input files used.
+and see the output file, `zfp608.png`. See `pyramid.ini` for list of input files used.
 
 #### Pair of HiC heatmaps + GRiNCH clusters
 
