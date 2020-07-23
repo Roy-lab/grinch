@@ -48,9 +48,9 @@ chr1	100000	125000	2
 * Optional output file suffixed '.graph' returns the graph used in regularization. File may be large, since the matrix is written in a dense format.
 
 #### Installation & Dependencies
-Installation instructions below were tested in Linux Centos 7 distribution. 
 
-[GSL (GNU Scientific Library)](https://www.gnu.org/software/gsl/doc/html/index.html) is used to handle matrix- and vector-related operations. 
+Installation instructions below were tested in Linux Centos 7 distribution. [GSL (GNU Scientific Library)](https://www.gnu.org/software/gsl/doc/html/index.html) is used to handle matrix- and vector-related operations. 
+
 1. __If you already have GSL installed__, edit the first two lines of the Makefile to point to the correct include and shared library directory, then jump to step 3.
 ```
 #CHANGE PATHS AS NEEDED:
@@ -65,9 +65,13 @@ conda install -c conda-forge gsl
 ```
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib
 ```
-4. And let's install!
+4. And let's install! In the same directory you have the code/Makefile, run:
 ```
 make
+```
+5. If all went well, you won't get any alarming messages, and you will see an executable named `grinch` created in the same directory. A quick test below will print the manual for grinch:
+```
+./grinch -h
 ```
 
 Note: in order to implement NNDSVD initialization of factors, a fast randomized SVD algorithm from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes) was used. A minor modification to allow random seed specification was made to the original code from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes/tree/master/single_core_gsl_code). This updated code is included under modules/random_svd directory. Compilation of this code is part of the included Makefile; no additional step is necessary for installation.
