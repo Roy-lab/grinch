@@ -24,7 +24,7 @@ conda install -c conda-forge gsl
 ```
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib
 ```
-4. And let's install! In the same directory you have the code/Makefile, run:
+4. And let's install! In the same directory you downloaded the code/Makefile (either by cloning the repository or by downloading a release), run:
 ```
 make
 ```
