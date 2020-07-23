@@ -51,7 +51,7 @@ chr1	100000	125000	2
 * Optional output file suffixed `.U` and `.V` returns the factors U and V respectively, in dense matrix format. File may be large, especially for higher-resolution input. Note that since the input cis-interaction Hi-C matrix is symmetric, U and V are equivalent up to some scaling factor and numerical error.
 * Optional output file suffixed `.graph` returns the graph used in regularization. File may be large, since the matrix is written in a dense format.
 
-### Visualize
+#### Visualize
 
 Refer to our [handy dandy visualization scripts](https://github.com/Roy-lab/grinch/blob/master/visualization/) to generate images of Hi-C heatmaps, GRiNCH clusters, and other 1D epigenetic signals like the one below:
 
