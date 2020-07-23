@@ -17,7 +17,7 @@ GRiNCH applies non-negative matrix factorization (NMF) with graph regularization
 | 1     | input matrix file      | Input matrix file path and name. Tab-delimited, in sparse matrix format, no header, e.g. 0 10 1201.78 | N/A | 
 | 2     | input bed file         | Input bed file mapping each index in the input matrix file to a chromosomal coordinate. Tab-delimited, no header, e.g. chr1 50000  75000 0. Note: Bin size/resolution of the Hi-C data is assumed to be the same across all bins. Also, only cis-interactions are handled, i.e. the chromosome for all bins are assumed to be the same. | N/A | 
 | optional | -o <output_file_prefix>    | Ouput file path and prefix. Note: will NOT create a directory if the specified directory does not exist. | 'output' | 
-| optional | -k <number_of_clusters>  | Number of clusters, an integer value. |  n/(1000000/bin size) where n is the dimension of the symmetric input Hi-C matrix and bin size is the resolution in basepairs, i.e. k is set such hat the expected size of a cluster is 1Mb. | 
+| optional | -k <number_of_clusters>  | Number of clusters, an integer value. |  n/(1000000/bin size) where n is the dimension of the symmetric input Hi-C matrix and bin size is the resolution in basepairs, i.e., k is set such hat the expected size of a cluster is 1Mb. | 
 | optional | -e <expected_size_of_cluster>  | A different way to specify the number of clusters by the expected size of a cluster, i.e. if -e 500000, k = n/(500KB/bin size), where n is the number of bins in the input matrix. Note: -k will override -e. | 1000000, i.e. k = n / (1Mb/bin size) |  
 | optional | -n <neighborhood_radius>  | Neighborhood radius used in regularization graph, in base pairs, and in multiples of resolution. -n 100000 would make neighborhood radius of 4 bins in 25kb resolution, and 4 adjacent regions on either side of a given regions will be used to regularize or 'smooth' the matrix factors. Increase for lower-depth or sparser data, to use more neighbors for smoothing. | 100000 | 
 | optional | -l <lambda>  | Strength of regularization. | 1 | 
@@ -40,19 +40,24 @@ chr1	75000	100000	1
 chr1	100000	125000	2
 ...
 ```
-
 #### Output files
-* File suffixed '.tads' returns a list of putative TADs, each line with the first and last bin of each TAD (inclusive of last bin).
-* File suffixed '.log' returns a plain-text file with list of parameter values used and time/memory consumption.
-* Optional output file suffixed '.smoothed' returns the smoothed matrix in a tab-delimited sparse matrix format. This file may be large.
-* Optional output file suffixed '.U' and '.V' returns the factors U and V respectively, in dense matrix format. File may be large, especially for higher-resolution input. Note that since the input cis-interaction Hi-C matrix is symmetric, U and V are equivalent up to some scaling factor and numerical error.
-* Optional output file suffixed '.graph' returns the graph used in regularization. File may be large, since the matrix is written in a dense format.
+* File suffixed `.tads` returns a list of putative TADs, each line with the first and last bin of each TAD (inclusive of last bin).
+* File suffixed `.log` returns a plain-text file with list of parameter values used and time/memory consumption.
+* Optional output file suffixed `.smoothed` returns the smoothed matrix in a tab-delimited sparse matrix format. This file may be large.
+* Optional output file suffixed `.U` and `.V` returns the factors U and V respectively, in dense matrix format. File may be large, especially for higher-resolution input. Note that since the input cis-interaction Hi-C matrix is symmetric, U and V are equivalent up to some scaling factor and numerical error.
+* Optional output file suffixed `.graph` returns the graph used in regularization. File may be large, since the matrix is written in a dense format.
+
+#### Visualize
+
+Refer to our [handy dandy visualization scripts](https://github.com/Roy-lab/grinch/blob/master/visualization/) to generate images of Hi-C heatmaps, GRiNCH clusters, and other 1D epigenetic signals like the one below:
+
+![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/zfp608.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells, neural precursor cells, and cortical neurons, along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals.")
 
 #### Installation & Dependencies
 
 Installation instructions below were tested in Linux Centos 7 distribution. [GSL (GNU Scientific Library)](https://www.gnu.org/software/gsl/doc/html/index.html) is used to handle matrix- and vector-related operations. 
 
-1. __If you already have GSL installed__, edit the first two lines of the Makefile to point to the correct include and shared library directory, then jump to step 3.
+1. __If you already have GSL installed__, edit the first few lines of the Makefile to point to the correct include and shared library directory, then jump to step 3.
 ```
 #CHANGE PATHS AS NEEDED:
 INCLUDE_PATH = ${CONDA_PREFIX}/include
