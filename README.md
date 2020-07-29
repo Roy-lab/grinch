@@ -7,7 +7,7 @@ GRiNCH applies non-negative matrix factorization (NMF) with graph regularization
 
 ![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/K562_chr12_5kb.png "GRINCH clusters discovered from Hi-C data, with CTCF binding enriched in cluster boundaries")
 
-### Step 1: Install 
+### [Step 1] Install 
 
 Installation instructions below were tested in Linux Centos 7 distribution. [GSL (GNU Scientific Library)](https://www.gnu.org/software/gsl/doc/html/index.html) is used to handle matrix- and vector-related operations. 
 
@@ -36,7 +36,7 @@ make
 
 Note: in order to implement NNDSVD initialization of factors, a fast randomized SVD algorithm from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes) was used. A minor modification to allow random seed specification was made to the original code from [RSVDPACK](https://github.com/sergeyvoronin/LowRankMatrixDecompositionCodes/tree/master/single_core_gsl_code). This updated code is included under modules/random_svd directory. Compilation of this code is part of the included Makefile; no additional step is necessary for installation.
 
-### Step 2: Run
+### [Step 2] Run
 
 #### Basic usage
 
@@ -85,9 +85,9 @@ chr1	100000	125000	2
 * Optional output file suffixed `.U` and `.V` returns the factors U and V respectively, in dense matrix format. File may be large, especially for higher-resolution input. Note that since the input cis-interaction Hi-C matrix is symmetric, U and V are equivalent up to some scaling factor and numerical error.
 * Optional output file suffixed `.graph` returns the graph used in regularization. File may be large, since the matrix is written in a dense format.
 
-### Step 3: Visualize
+### [Step 3] Visualize
 
-Refer to our [handy dandy visualization scripts](https://github.com/Roy-lab/grinch/blob/master/visualization/) to generate images of Hi-C heatmaps, GRiNCH clusters, and other 1D epigenetic signals like the one below:
+Refer to our [handy dandy visualization tutorial](https://github.com/Roy-lab/grinch/blob/master/visualization/) to generate images of Hi-C heatmaps, GRiNCH clusters, and other 1D epigenetic signals like the one below:
 
 ![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/zfp608.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells, neural precursor cells, and cortical neurons, along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals.")
 
