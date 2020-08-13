@@ -5,7 +5,7 @@
 
 GRiNCH applies non-negative matrix factorization (NMF) with graph regularization to discover clusters of highly interacting genomic regions from high-throughput chromosome conformation capture (Hi-C) data. GRiNCH can be used to smooth the input matrices, and can be applied to data from any 3D genome platforms (e.g. HiChIP, SPRITE) in a non-negative square matrix format.
 
-![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/K562_chr12_5kb.png "GRINCH clusters discovered from Hi-C data, with CTCF binding enriched in cluster boundaries")
+![alt text](https://github.com/Roy-lab/grinch/blob/master/overview.png "Overview of GRiNCH. GRiNCH applies Non-negative Matrix Factorization (NMF) to a Hi-C or a similar high-throughput 3C matrix to find clusters of densely interacting genomic regions. NMF recovers low-dimensional factors U and V$ of the input matrix X that can be used to reconstruct the input matrix. As nearby genomic regions tend to interact more with each other, we regularize the factor matrices with a neighborhood graph to encourage neighboring regions to have a similar lower-dimensional representation, and subsequently belong to the same cluster. We cluster the regions by treating one of the factor matrices as a set of latent features and applying $k$-medoids clustering. The clusters represent topological units such as TADs. The factor matrices can be multiplied together to yield a smoothed  version of the input matrix which is often sparse and noisy.")
 
 ### [Step 1] Install 
 
