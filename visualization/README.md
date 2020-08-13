@@ -9,7 +9,7 @@ The scripts were tested in Python 3.7 Anaconda environment. Here are the depende
 * pandas
 
 #### [Step 2] Download example input data
-1. Download the tarball of the dataset used to generate the example figures: <http://pages.discovery.wisc.edu/~elee1/grinch_git/data.tgz>. 
+1. [Download the tarball](https://drive.google.com/file/d/1-iopSH7uI_Fra9wE6k6uGXeRXrwYQDoJ/view?usp=sharing) of the dataset used to generate the example figures. 
 2. Place the `data/` directory at the same level as the rest of the visualization scripts (then you can simply run the scripts with the commands noted below). 
 
 #### [Step 3] Check out the input data format
