@@ -1,5 +1,5 @@
+theme: jekyll-theme-minimal
 title: GRiNCH
 description: Graph-Regularized NMF and Clustering for Hi-C
-theme: jekyll-theme-minimal
 logo: http://pages.discovery.wisc.edu/~elee1/grinch_git/grinch.jpg
 show_downloads: true
