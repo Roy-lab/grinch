@@ -5,7 +5,7 @@
 
 GRiNCH applies non-negative matrix factorization (NMF) with graph regularization to discover clusters of highly interacting genomic regions from high-throughput chromosome conformation capture (Hi-C) data. GRiNCH can be used to smooth the input matrices, and can be applied to data from any 3D genome platforms (e.g. HiChIP, SPRITE) in a non-negative square matrix format. Preprint now available on bioRxiv: [https://doi.org/10.1101/2020.08.17.254615](https://www.biorxiv.org/content/10.1101/2020.08.17.254615v1)
 
-![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/overview.png "Overview of GRiNCH. GRiNCH applies Non-negative Matrix Factorization (NMF) to a Hi-C or a similar high-throughput 3C matrix to find clusters of densely interacting genomic regions. NMF recovers low-dimensional factors U and V of the input matrix X that can be used to reconstruct the input matrix. As nearby genomic regions tend to interact more with each other, we regularize the factor matrices with a neighborhood graph to encourage neighboring regions to have a similar lower-dimensional representation, and subsequently belong to the same cluster. We cluster the regions by treating one of the factor matrices as a set of latent features and applying k-medoids clustering. The clusters represent topological units such as TADs. The factor matrices can be multiplied together to yield a smoothed  version of the input matrix which is often sparse and noisy.")
+![alt text](figures-for-doc/overview.png "Overview of GRiNCH. GRiNCH applies Non-negative Matrix Factorization (NMF) to a Hi-C or a similar high-throughput 3C matrix to find clusters of densely interacting genomic regions. NMF recovers low-dimensional factors U and V of the input matrix X that can be used to reconstruct the input matrix. As nearby genomic regions tend to interact more with each other, we regularize the factor matrices with a neighborhood graph to encourage neighboring regions to have a similar lower-dimensional representation, and subsequently belong to the same cluster. We cluster the regions by treating one of the factor matrices as a set of latent features and applying k-medoids clustering. The clusters represent topological units such as TADs. The factor matrices can be multiplied together to yield a smoothed  version of the input matrix which is often sparse and noisy.")
 
 ### [Step 1] Install 
 
@@ -89,6 +89,6 @@ chr1	100000	125000	2
 
 Refer to our [handy dandy visualization tutorial](https://github.com/Roy-lab/grinch/blob/master/visualization/) to generate images of Hi-C heatmaps, GRiNCH clusters, and other 1D epigenetic signals like the one below:
 
-![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/zfp608.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells, neural precursor cells, and cortical neurons, along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals.")
+![alt text](figures-for-doc/zfp608.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells, neural precursor cells, and cortical neurons, along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals.")
 
 
