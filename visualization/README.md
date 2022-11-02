@@ -1,12 +1,13 @@
 ### Visualization Tutorial
 
 #### [Step 1] Install dependencies
-The scripts were tested in Python 3.7 Anaconda environment. Here are the dependencies, all of which can be installed with conda.
-* [pyBigWig](https://github.com/deeptools/pyBigWig)
-* matplotlib
-* seaborn
-* numpy
-* pandas
+The scripts were tested in Python 3.7.12 Anaconda environment. Here are the dependencies, all of which can be installed with conda.
+* [pyBigWig](https://github.com/deeptools/pyBigWig)=0.3.18
+* matplotlib=3.3.3
+* seaborn=0.12.1
+* numpy=1.20.3
+* pandas=1.3.5
+NOTE: Newer versions of Python (i.e. 3.9.X) is NOT compatible with pyBigWig. Creating a conda environment with the specified version of Python and the listed dependencies will ensure the scripts all run without errors.
 
 #### [Step 2] Download example input data
 1. [Download the tarball](https://drive.google.com/file/d/1-iopSH7uI_Fra9wE6k6uGXeRXrwYQDoJ/view?usp=sharing) of the dataset used to generate the example figures. 
