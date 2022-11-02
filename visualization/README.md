@@ -7,6 +7,7 @@ The scripts were tested in Python 3.7.12 Anaconda environment. Here are the depe
 * seaborn=0.12.1
 * numpy=1.20.3
 * pandas=1.3.5
+
 NOTE: Newer versions of Python (i.e. 3.9.X) is NOT compatible with pyBigWig. Creating a conda environment with the specified version of Python and the listed dependencies will ensure the scripts all run without errors.
 
 #### [Step 2] Download example input data
