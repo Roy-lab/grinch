@@ -22,9 +22,9 @@ NOTE: Newer versions of Python (i.e. 3.9.X) is NOT compatible with pyBigWig. Cre
 
 `python pyramid.py pyramid.ini` will output `zfp608.png`, shown below. The figure contains HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells (first column), neural precursor cells (second column), and cortical neurons (third column), along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals. Note: for visualization purposes, the interaction counts in the HiC matrices have been log2-transformed.
 
-![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/zfp608.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells, neural precursor cells, and cortical neurons, along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals.")
+![alt text](zfp608.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells, neural precursor cells, and cortical neurons, along with GRiNCH clusters, and tracks for gene locations, H3k27ac ChIP-seq signals, and CTCF ChIP-seq signals.")
 
 #### [Step 4.2] Run example 2: pair of HiC heatmaps + GRiNCH clusters
 `python diamond.py diamond.ini` will output `es_vs_cn.png`, shown below. The figure contains HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells (top) and cortical neurons (bottom), along with the GRiNCH clusters. Note: for visualization purposes, the interaction counts in the HiC matrices have been log2-transformed.
 
-![alt text](http://pages.discovery.wisc.edu/~elee1/grinch_git/es_vs_cn.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells and cortical neurons, along with GRiNCH clusters.")
+![alt text](es_vs_cn.png "HiC heatmaps from a 4Mb region around zfp608 gene in chr18 of mouse embryonic stem cells and cortical neurons, along with GRiNCH clusters.")
